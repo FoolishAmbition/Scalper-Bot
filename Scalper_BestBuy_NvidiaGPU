@@ -18,7 +18,7 @@ while (bought<1):
     driver.set_page_load_timeout(30)
     driver.maximize_window()
     
-    driver.get("https://www.bestbuy.com/site/sony-playstation-5-console/6426149.p?skuId=6426149") #BestBuy PS5 Console Standard (Sold Out)
+    driver.get("https://www.bestbuy.com/site/nvidia-geforce-rtx-5090-32gb-gddr7-graphics-card-dark-gun-metal/6614151.p?skuId=6614151") #BestBuy NVIDIA - GeForce RTX 5090 32GB GDDR7 Graphics Card - Dark Gun Metal
     
     buyButton = False
     
@@ -77,13 +77,13 @@ while (bought<1):
     print("Credit card information input in the form.")
     
     #Billing address
-    driver.find_element_by_id("payment.billingAddress.firstName").send_keys("Name")
-    driver.find_element_by_id("payment.billingAddress.lastName").send_keys("Last name")
-    driver.find_element_by_id("payment.billingAddress.street").send_keys("Address")
+    driver.find_element_by_id("payment.billingAddress.firstName").send_keys("Teck Shun")
+    driver.find_element_by_id("payment.billingAddress.lastName").send_keys("Ong")
+    driver.find_element_by_id("payment.billingAddress.street").send_keys("BoonLay")
     driver.find_element_by_id("payment.billingAddress.street").send_keys(Keys.DOWN, Keys.ENTER)
-    driver.find_element_by_id("payment.billingAddress.city").send_keys("City")
-    driver.find_element_by_id("payment.billingAddress.state").send_keys("State")
-    driver.find_element_by_id("payment.billingAddress.zipcode").send_keys("Zip code")
+    driver.find_element_by_id("payment.billingAddress.city").send_keys("Singapore")
+    driver.find_element_by_id("payment.billingAddress.state").send_keys("Singapore")
+    driver.find_element_by_id("payment.billingAddress.zipcode").send_keys("051732")
     print("Billing Address input in the form.")
     
     #Place order
