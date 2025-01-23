@@ -53,8 +53,16 @@ while bought < 1:
                 page.reload()
 
         # Go to cart
-        page.wait_for_selector(".go-to-cart-button").click()
-        print("Go-to-cart button was clicked.")
+        try:
+            page.wait_for_selector(".go-to-cart-button", timeout=10000)  # Wait for up to 10 seconds
+            page.locator(".go-to-cart-button").click()  # Click on the "Go to Cart" button
+            print("Go-to-cart button was clicked.")
+        except Exception as e:
+            print(f"Error while clicking 'Go to Cart' button: {e}")
+            page.screenshot(path="go_to_cart_error_screenshot.png")  # Capture screenshot on error
+            print("Screenshot saved as go_to_cart_error_screenshot.png")
+            page.reload()  # Optionally reload the page and continue
+
 
         # Continue to checkout
         page.wait_for_selector(".checkout-buttons__checkout").click()
