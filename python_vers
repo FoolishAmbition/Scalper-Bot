@@ -1,7 +1,16 @@
 import time
 from playwright.sync_api import sync_playwright
+import re
 
 bought = 0
+
+#Blocks unnecessary resources (webfonts, JS, CSS, images) for faster loading
+def block_resources(route):
+    if route.request.resource_type in ["image", "stylesheet", "font", "script"]:
+        route.abort()
+    else:
+        route.continue_()
+
 
 while bought < 1:
     with sync_playwright() as p:
@@ -11,59 +20,68 @@ while bought < 1:
         page = context.new_page()
         print("new blank page loaded")
 
-        # Block images for faster loading
-        context.route("**/*", lambda route: route.abort() if "image" in route.request.resource_type else route.continue_())
-        print("blocked images from appearing for fast loading")
+        # Block images, stylesheets, fonts, and scripts for faster loading
+        context.route("**/*", block_resources)
+        print("blocked unnecessary resources for fast loading")
 
-        # Navigate to the BestBuy product page
-        page.goto("https://www.bestbuy.com/site/xgimi-halo-1080p-hdr-smart-portable-projector-with-harman-kardon-speaker-2-5h-built-in-battery-and-android-tv-silver/6518392.p?skuId=6518392")
+        # Navigate to the BestBuy product page (this can be dynamically provided)
+        url = "https://www.bestbuy.com/site/msi-nvidia-geforce-rtx-4060-8gb-ventus-2x-oc-8gb-gddr6-pci-express-4-0-graphics-card-black/6548653.p?skuId=6548653"
+        page.goto(url)
         print("page directed to bestbuy link")
+
+        # Extract SKU from the URL
+        sku_id = re.search(r"skuId=(\d+)", url).group(1)
+        print(f"Extracted SKU: {sku_id}")
 
         # Handle region selection (if applicable)
         try:
-            # Use a more specific locator to target the correct "United States" link
             us_link = page.locator("a.us-link:has-text('United States')").first
-            if us_link.is_visible(timeout=5000):  # Adjust timeout as necessary
+            if us_link.is_visible(timeout=5000):
                 us_link.click()
                 print("Clicked on 'United States' region")
-                time.sleep(3)  # Wait for the page to reload
+                time.sleep(3)
         except Exception as e:
             print("Region selection not required or failed:", e)
 
-        buy_button_available = False
+        # Find the Add to Cart button using the SKU ID
+        try:
+            add_to_cart_button = page.wait_for_selector(f"button[data-sku-id='{sku_id}'].add-to-cart-button", timeout=10000)
+            if add_to_cart_button.is_visible() and add_to_cart_button.is_enabled():
+                add_to_cart_button.click()
+                print("Add-to-Cart button clicked.")
 
-        while not buy_button_available:
+                # Wait for the cart to update (wait for any cart-link update)
+                try:
+                    page.wait_for_selector("a.cart-link", timeout=10000)  # Check if cart icon appears
+                    print("Cart updated.")
+                    bought = 1
+                except Exception as e:
+                    print(f"Error confirming cart update: {e}")
+                    page.screenshot(path="cart_update_error.png")
+            else:
+                print("Add-to-Cart button is not clickable or visible.")
+                page.screenshot(path="add_to_cart_button_error.png")
+        except Exception as e:
+            print(f"Error confirming cart update: {e}")
+            page.screenshot(path="cart_update_error.png")
+
+        # Redirect to the cart page after adding to cart
+        if bought == 1:
             try:
-                # Check if "Add to Cart" button is disabled
-                if page.locator(".btn-disabled").is_visible():
-                    t = time.strftime("%H:%M:%S", time.localtime())
-                    print(t + " Add-to-cart button is not ready yet.")
-                    time.sleep(15)
-                    page.reload()
-                else:
-                    # "Add to Cart" button is available
-                    print("Add-to-cart button available.")
-                    page.locator(".fulfillment-add-to-cart-button").click()
-                    print("Add-to-cart button was clicked.")
-                    buy_button_available = True
+                print("Attempting to redirect to the cart page...")
+                page.goto("https://www.bestbuy.com/cart", timeout=120000, wait_until="networkidle")  # Increase timeout to 120 seconds and wait until network is idle
+                print("Redirected to the cart page.")
             except Exception as e:
-                print(f"Error while checking the add-to-cart button: {e}")
-                page.screenshot(path="error_screenshot.png")
-                print("Screenshot saved as error_screenshot.png")
-                page.reload()
+                print(f"Error navigating to the cart page: {e}")
+                page.screenshot(path="cart_navigation_error.png")
 
-        # Click on the cart icon
-            # Wait for the cart icon to be visible and click it
-                page.wait_for_selector("a.cart-link", timeout=10000)  # Adjust the timeout as necessary
-                page.locator("a.cart-link").click()  # Click the cart icon
-                print("Cart icon was clicked.")
-            except Exception as e:
-                # If there's an error, capture the exception and save a screenshot
-                print(f"Error while clicking the cart icon: {e}")
-                page.screenshot(path="cart_icon_error_screenshot.png")  # Save screenshot
-                print("Screenshot saved as cart_icon_error_screenshot.png")
-                page.reload()  # Optionally reload the page to recover
 
+
+
+
+
+
+#not yet done/updated
         # Continue to checkout
         page.wait_for_selector(".checkout-buttons__checkout").click()
         print("Checkout button was clicked.")
