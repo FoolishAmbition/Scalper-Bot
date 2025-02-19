@@ -1,4 +1,4 @@
-Challenges and Solutions
+**Challenges and Solutions**
 1. Speeding Up Web Scraping
 Issue: The script initially loaded all resources on the page, which made it run slower than expected.
 Solution: To make things faster, I added a function to block unnecessary resources like images, fonts, CSS, and JavaScript, cutting down load times significantly.
