@@ -7,7 +7,7 @@ Takeaway: Reducing extra network requests is an easy way to boost automation spe
 
 2. Extracting SKU from URL with Regex
 Issue: The script needed to dynamically grab the SKU ID from the product URL to locate the "Add to Cart" button.
-Solution: I used a simple regular expression (re.search(r"skuId=(\d+)", url)) to pull out the numeric SKU from the URL.
+Solution: I used a **simple regular expression (re.search(r"skuId=(\d+)", url))** to pull out the numeric SKU from the URL.
 Takeaway: Regex is a handy tool for extracting structured data like IDs from URLs.
 
 
@@ -19,23 +19,23 @@ Takeaway: Websites with regional redirects can disrupt automation, so handling t
 
 4. Ensuring the "Add to Cart" Button Works
 Issue: Sometimes, the "Add to Cart" button wasn’t available due to stock issues or slow page loading.
-Solution: I used wait_for_selector() with a timeout to make sure the button appeared before interacting with it.
+Solution: I used **wait_for_selector()** with a timeout to make sure the button appeared before interacting with it.
 Takeaway: Adding proper wait times helps prevent automation failures caused by elements not loading in time.
 
 5. Confirming the Item Was Added to Cart
 Issue: Clicking "Add to Cart" didn’t always mean the item was successfully added.
-Solution: I added a check for the cart icon ("a.cart-link") to confirm that the cart was updated properly.
+Solution: I added a check for the **cart icon ("a.cart-link")** to confirm that the cart was updated properly.
 Takeaway: Double-checking actions like adding items to a cart prevents false positives in automation scripts.
 
 
 6. Handling Page Navigation and Errors
 Issue: Sometimes, page redirections failed due to slow network conditions.
-Solution: I increased timeout settings and used "wait_until='networkidle'" to ensure the page was fully loaded before proceeding.
+Solution: I increased timeout settings and used **"wait_until='networkidle'"** to ensure the page was fully loaded before proceeding.
 Takeaway: Adjusting timeout settings prevents the script from interacting with incomplete pages.
 
 
 7. Automating Checkout Securely
 Issue: Entering sensitive payment information in an automated way needed to be done carefully.
-Solution: I used page.fill() to enter payment details dynamically. (For real-world applications, secure storage should be used instead of hardcoding data.)
+Solution: I used **page.fill()** to enter payment details dynamically. (For real-world applications, secure storage should be used instead of hardcoding data.)
 Takeaway: Automating form filling is useful, but security measures are necessary when handling sensitive information.
 
